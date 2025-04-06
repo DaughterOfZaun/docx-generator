@@ -1,0 +1,10 @@
+{
+  "dependencies": {
+    "@types/bun": "^1.2.8",
+    "@types/node": "^22.14.0",
+    "@types/react-dom": "^19.1.1",
+    "docx": "^9.3.0",
+    "react-dom": "^19.1.0",
+    "water.css": "^2.1.1"
+  }
+}
