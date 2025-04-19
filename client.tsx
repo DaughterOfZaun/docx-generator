@@ -20,24 +20,18 @@ const cacheInitialValue: Cache = {version: -1, files:{}, fields:{}}
 function App() {
 
     let [cache, setCache] = useState(cacheInitialValue)
-    //let [cacheVersion, setCacheVersion] = useState(0) //HACK:
-    //let [cacheVersion, setCacheVersion] = [0, (to: number) => { cacheVersion = to; reloadCache() }]
     let [checkedFiles, setCheckedFiles] = useState([] as number[])
 
-    useEffect(reloadCache, [/*cacheVersion*/])
+    useEffect(reloadCache, [])
     function reloadCache() {
         const endpoint = (cache.version == -1) ? '/api/cache' : '/api/cache-updated'
         fetch(endpoint).then(res => res.json()).then(res => setCache(res))
     }
-    
-    if(cache == cacheInitialValue){
-        //return <h1>Loading cache...</h1>
-    }
-    
-    async function handleSubmit(event){
+        
+    function handleSubmit(event){
         event.preventDefault()
         const formData = new FormData(event.target)
-        await fetch('/api/generate', {
+        fetch('/api/generate', {
             method: 'POST',
             body: JSON.stringify({
                 files: checkedFiles,
@@ -46,24 +40,28 @@ function App() {
             })
         })
     }
-    
-    async function handleReload(event) {
+
+    function handleReset(event) {
         event.preventDefault()
-        //setCacheVersion(cacheVersion + 1)
+        for(let textarea of document.querySelectorAll('textarea'))
+            textarea.value = ''
+    }
+    
+    function handleReload(event) {
+        event.preventDefault()
         reloadCache()
     }
 
     function handleChange(event) {
-        //event.preventDefault()
         const index = parseInt(event.target.value)
         const checked = !!event.target.checked
         const newCheckedFiles = checked ? [...checkedFiles, index] : checkedFiles.filter(i => i != index)
         setCheckedFiles(newCheckedFiles)
     }
     
-    return <form onSubmit={handleSubmit}>
-        {/* <button onClick={handleReload}>Reload</button> */}
-        <p>{
+    return <form onSubmit={handleSubmit} onReset={handleReset}>
+        <button onClick={handleReload}>Reload</button>
+        <hr/>{
             Object.entries(cache.files).map(([index, { path }]) => {
                 const id = `file-${index}`
                 return <div key={id}>
@@ -71,15 +69,16 @@ function App() {
                     <label htmlFor={id}>{path}</label>
                 </div>
             })
-        }</p><p>{
+        }<hr/>{
             Object.entries(cache.fields).map(([field, { usedBy }]) => {
                 const hidden = usedBy.every(index => !checkedFiles.includes(index))
                 return <div key={field} className="field" data-usedby={usedBy.join(',')} hidden={hidden}>
                     <textarea name={field} placeholder={field}></textarea>
                 </div>
             })
-        }</p>
+        }<hr/>
         <button type="submit" disabled={!checkedFiles.length}>Generate</button>
+        <button type="reset">Reset</button>
     </form>
 }
 

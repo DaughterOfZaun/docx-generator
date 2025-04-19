@@ -11,8 +11,6 @@ export function replacer(key, value) {
             type: 'Set',
             data: Array.from(value.values()),
         }
-    } else if (value.type == 'Buffer') {
-        return undefined
     } else {
         return value
     }

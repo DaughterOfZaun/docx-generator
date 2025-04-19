@@ -1,0 +1,3 @@
+[submodule "lib/docx"]
+	path = lib/docx
+	url = https://github.com/dolanmiu/docx
